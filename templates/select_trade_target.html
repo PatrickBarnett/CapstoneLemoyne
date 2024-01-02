@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Wishlist Trades</title>
+</head>
+<body>
+
+        <!--Sends a message to the user-->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p style="color: {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home/Collection</a></li>
+            <li><a href="{{ url_for('search') }}">Search</a></li>
+            <li><a href="{{ url_for('wishlist') }}">Wishlist</a></li>
+            <li><a href="{{ url_for('trade_binder') }}">TradeBinder</a></li>
+            <li><a href="{{ url_for('initiate_trade') }}">Start a trade</a></li>
+            <li><a href="{{ url_for('view_offers') }}">View Your Offers</a></li>
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit">Logout</button>
+            </form>
+        </ul>
+    </nav>
+
+    <!-- This will make sure that if the user has the card they are looking for in their trade binder they wont see themselves-->
+{% set eligible_users = available_users | selectattr('0', '!=', current_user_id) | list %}
+
+
+<h1>Users who have {{wishlist_card_name}}</h1>
+    {% if eligible_users%}
+        <form action="{{ url_for('finalize_trade_offer') }}" method="post">
+            <input type="hidden" name="wishlist_card_id" value="{{ wishlist_card_id }}">
+
+            <label for="target_user">Available users:</label>
+            <select name="target_user" id="target_user">
+                {% for user in available_users %}
+                    {% if user[0] != current_user_id %}
+                        <option value="{{ user[0] }}">{{ user[0] }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+            <label for="offered_card">Offer a card from your binder:</label>
+            <select name="offered_card" id="offered_card">
+                {% for card in user_trade_binder %}
+                    <option value="{{ card[2] }}">{{ card[4] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="cash_offer">Cash Offer ($):</label>
+            <input type="number" name="cash_offer" id="cash_offer" min="0" placeholder="Amount in dollars">
+
+            <button type="submit" onclick="disableButton(this)">Make Offer</button>
+    {% else %}
+            <p> No users have this card unfortunately.</p>
+    {% endif %}
+</form>
+
+<!-- Only allow buttons to be pressed once -->
+<script>
+    function disableButton(btn) {
+        btn.disabled = true;
+        btn.form.submit();
+    }
+    </script>
+
+</body>
+</html>

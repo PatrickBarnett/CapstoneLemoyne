@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+
+    <!--Sends a message to the user-->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p style="color: {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="/register" method="post">
+        <label for="username">Username:</label>
+        <input type="text" name="username" required><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" name="password" required><br><br>
+
+        <input type="submit" value="Register" onclick="disableButton(this)">
+    </form>
+    <br>
+    <a href="/login">Already have an account? Login here.</a>
+
+    <!-- Only allow buttons to be pressed once -->
+    <script>
+      function disableButton(btn) {
+          btn.disabled = true;
+          btn.form.submit();
+      }
+      </script>
+
+</body>
+</html>

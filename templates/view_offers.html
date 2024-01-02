@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>View Trade Offers</title>
+</head>
+<body>
+
+    <!--Sends a message to the user-->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p style="color: {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home/Collection</a></li>
+            <li><a href="{{ url_for('search') }}">Search</a></li>
+            <li><a href="{{ url_for('wishlist') }}">Wishlist</a></li>
+            <li><a href="{{ url_for('trade_binder') }}">TradeBinder</a></li>
+            <li><a href="{{ url_for('initiate_trade') }}">Start a trade</a></li>
+            <li><a href="{{ url_for('view_offers') }}">View Your Offers</a></li>
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit">Logout</button>
+            </form>
+        </ul>
+    </nav>
+    <h1>Trade Offers</h1>
+    
+    <section>
+        <h2>Received Offers</h2>
+        {% if received_offers %}
+            <ul>
+                {% for offer in received_offers %}
+                    <li>
+                        Offer from User {{ offer[1] }}: Your 
+                        "{{ offer[8] }}" for their "{{ offer[7] }}"
+                        {% if offer[5] %} 
+                        and ${{ offer[5] }} 
+                        {% endif %}
+                        <!-- Form for Accepting Offer -->
+                        <form action="{{ url_for('accept_offer', trade_id=offer[0])}}" method="post">
+                            <button type="submit" onclick="disableButton(this)">Accept</button>
+                        </form>
+
+                        <!-- Form for Rejecting Offer -->
+                        <form action="{{ url_for('reject_offer', trade_id=offer[0]) }}" method="post">
+                            <button type="submit" onclick="disableButton(this)">Reject</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No received offers.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Sent Offers</h2>
+        {% if sent_offers %}
+            <ul>
+                {% for offer in sent_offers %}
+                    <li>
+                        Offer sent to User {{ offer[2] }}: Their
+                        "{{ offer[8] }}" for your "{{ offer[7] }}"
+                        {% if offer[5] %} 
+                        and ${{ offer[5] }} 
+                        {% endif %}
+
+                        <!-- Form for Rejecting Offer -->
+                        <form action="{{ url_for('cancel_offer', trade_id=offer[0]) }}" method="post">
+                            <button type="submit" onclick="disableButton(this)">Cancel</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No sent offers.</p>
+        {% endif %}
+    </section>
+
+    <!-- Accepted Offers Section -->
+    <section>
+        <h2>Accepted Offers</h2>
+        {% if accepted_offers %}
+            <ul>
+                {% for offer in accepted_offers %}
+                    Accepted Offer from User {{ offer[2] }}: 
+                    "{{ offer[8] }}" for your "{{ offer[7] }}"
+                    {% if offer[5] %} 
+                    and ${{ offer[5] }} 
+                    {% endif %}
+                    <br>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No accepted offers.</p>
+        {% endif %}
+    </section>
+
+    <!-- Rejected Offers Section -->
+    <section>
+        <h2>Rejected Offers</h2>
+        {% if rejected_offers %}
+            <ul>
+                {% for offer in rejected_offers %}
+                    Rejected Offer from User {{ offer[2] }}: 
+                    "{{ offer[8] }}" for your "{{ offer[7] }}"
+                    {% if offer[5] %} 
+                    and ${{ offer[5] }} 
+                    {% endif %}
+                    <br>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No rejected offers.</p>
+        {% endif %}
+    </section>
+
+        <!-- canceled Offers Section -->
+        <section>
+            <h2>Canceled Offers</h2>
+            {% if canceled_offers %}
+                <ul>
+                    {% for offer in canceled_offers %}
+                        Canceled Offer from User {{ offer[2] }}: 
+                        "{{ offer[8] }}" for your "{{ offer[7] }}"
+                        {% if offer[5] %} 
+                        and ${{ offer[5] }} 
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No canceled offers.</p>
+            {% endif %}
+        </section>
+
+    <!-- Only allow buttons to be pressed once -->
+    <script>
+        function disableButton(btn) {
+            btn.disabled = true;
+            btn.form.submit();
+        }
+        </script>
+
+</body>
+</html>
